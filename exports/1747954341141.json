@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747954341141,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_LiveChat",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/GV_LiveChat.tsx",
+      "type": "text",
+      "size": 38225,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747957393513,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_RatingReview",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_RatingReview.tsx",
+      "type": "text",
+      "size": 50897,
+      "dependencies": false
+    }
+  ]
+}

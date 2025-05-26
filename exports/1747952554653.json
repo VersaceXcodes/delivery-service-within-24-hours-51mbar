@@ -1,0 +1,15 @@
+{
+  "timestamp": 1747952554653,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/package.json",
+      "type": "text",
+      "size": 2919,
+      "dependencies": true
+    }
+  ]
+}

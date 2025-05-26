@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747957629193,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_BusinessAnalytics",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_BusinessAnalytics.tsx",
+      "type": "text",
+      "size": 53709,
+      "dependencies": false
+    }
+  ]
+}

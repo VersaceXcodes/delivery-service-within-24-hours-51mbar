@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747956842123,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_Profile",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_Profile.tsx",
+      "type": "text",
+      "size": 71754,
+      "dependencies": false
+    }
+  ]
+}

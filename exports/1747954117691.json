@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747954117691,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_TopNav",
+      "version": "1747952248985"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/GV_TopNav.tsx",
+      "type": "text",
+      "size": 23433,
+      "dependencies": false
+    }
+  ]
+}

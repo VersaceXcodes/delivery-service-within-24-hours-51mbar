@@ -1,0 +1,15 @@
+{
+  "timestamp": 1747951288851,
+  "operation": {
+    "id": "backend:server:main"
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/backend/server.js",
+      "type": "text",
+      "size": 93960,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747953014664,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_DeliveryRequest",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_DeliveryRequest.tsx",
+      "type": "text",
+      "size": 60146,
+      "dependencies": false
+    }
+  ]
+}

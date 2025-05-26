@@ -1,0 +1,15 @@
+{
+  "timestamp": 1747949914034,
+  "operation": {
+    "id": "backend:specifications:asyncapi"
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/backend/asyncapi.yaml",
+      "type": "text",
+      "size": 28771,
+      "dependencies": false
+    }
+  ]
+}

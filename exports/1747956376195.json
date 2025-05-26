@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747956376195,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_PaymentMethods",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_PaymentMethods.tsx",
+      "type": "text",
+      "size": 38838,
+      "dependencies": false
+    }
+  ]
+}

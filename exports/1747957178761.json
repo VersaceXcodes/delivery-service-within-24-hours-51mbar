@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747957178761,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_BusinessTeam",
+      "version": "1747957178253"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_BusinessTeam.tsx",
+      "type": "text",
+      "size": 56903,
+      "dependencies": false
+    }
+  ]
+}

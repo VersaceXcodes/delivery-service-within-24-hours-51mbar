@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747952598173,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_PasswordReset",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_PasswordReset.tsx",
+      "type": "text",
+      "size": 29125,
+      "dependencies": false
+    }
+  ]
+}

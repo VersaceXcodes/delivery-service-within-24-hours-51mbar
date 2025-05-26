@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747958320362,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_NotificationSystem",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/GV_NotificationSystem.tsx",
+      "type": "text",
+      "size": 24542,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": 1747951007199,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/backend/package.json",
+      "type": "text",
+      "size": 913,
+      "dependencies": true
+    },
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/backend/.env",
+      "type": "text",
+      "size": 739,
+      "dependencies": false
+    }
+  ]
+}

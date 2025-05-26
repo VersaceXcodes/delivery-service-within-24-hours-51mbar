@@ -1,0 +1,975 @@
+asyncapi: 2.0.0
+info:
+  title: QuickDrop Realtime Events API
+  version: 1.0.0
+  description: Comprehensive realtime WebSocket API for QuickDrop same-day
+    delivery platform covering courier tracking, delivery status updates,
+    messaging, and notifications
+  contact:
+    name: QuickDrop API Team
+    email: api@quickdrop.com
+servers:
+  development:
+    url: http://localhost:3000
+    protocol: ws
+    description: Development WebSocket server
+channels:
+  courier/location/update:
+    description: Real-time courier GPS location updates for delivery tracking
+    publish:
+      operationId: publishCourierLocationUpdate
+      summary: Courier sends location update
+      message:
+        $ref: "#/components/messages/CourierLocationUpdate"
+    subscribe:
+      operationId: subscribeCourierLocationUpdate
+      summary: Receive courier location updates
+      message:
+        $ref: "#/components/messages/CourierLocationBroadcast"
+  delivery/status/changed:
+    description: Delivery status change notifications for all delivery participants
+    publish:
+      operationId: publishDeliveryStatusChange
+      summary: Update delivery status
+      message:
+        $ref: "#/components/messages/DeliveryStatusChange"
+    subscribe:
+      operationId: subscribeDeliveryStatusChange
+      summary: Receive delivery status updates
+      message:
+        $ref: "#/components/messages/DeliveryStatusBroadcast"
+  delivery/request/new:
+    description: New delivery requests broadcasted to available couriers
+    subscribe:
+      operationId: subscribeNewDeliveryRequest
+      summary: Receive new delivery requests
+      message:
+        $ref: "#/components/messages/NewDeliveryRequest"
+  chat/message:
+    description: Real-time messaging between senders and couriers
+    publish:
+      operationId: publishChatMessage
+      summary: Send chat message
+      message:
+        $ref: "#/components/messages/ChatMessageSend"
+    subscribe:
+      operationId: subscribeChatMessage
+      summary: Receive chat messages
+      message:
+        $ref: "#/components/messages/ChatMessageReceive"
+  courier/assignment:
+    description: Courier assignment notifications for delivery senders
+    subscribe:
+      operationId: subscribeCourierAssignment
+      summary: Receive courier assignment notifications
+      message:
+        $ref: "#/components/messages/CourierAssigned"
+  system/notification:
+    description: System-wide notifications and announcements
+    subscribe:
+      operationId: subscribeSystemNotification
+      summary: Receive system notifications
+      message:
+        $ref: "#/components/messages/SystemNotification"
+  courier/availability/changed:
+    description: Courier availability status updates for dispatcher systems
+    publish:
+      operationId: publishCourierAvailabilityChange
+      summary: Update courier availability
+      message:
+        $ref: "#/components/messages/CourierAvailabilityChange"
+    subscribe:
+      operationId: subscribeCourierAvailabilityChange
+      summary: Receive courier availability updates
+      message:
+        $ref: "#/components/messages/CourierAvailabilityBroadcast"
+  delivery/eta/updated:
+    description: Dynamic ETA updates based on real-time conditions
+    subscribe:
+      operationId: subscribeDeliveryEtaUpdate
+      summary: Receive delivery ETA updates
+      message:
+        $ref: "#/components/messages/DeliveryEtaUpdate"
+  delivery/tracking/milestone:
+    description: Important delivery milestone notifications
+    subscribe:
+      operationId: subscribeDeliveryMilestone
+      summary: Receive delivery milestone notifications
+      message:
+        $ref: "#/components/messages/DeliveryMilestone"
+  business/dashboard/update:
+    description: Real-time business dashboard updates for corporate accounts
+    subscribe:
+      operationId: subscribeBusinessDashboardUpdate
+      summary: Receive business dashboard updates
+      message:
+        $ref: "#/components/messages/BusinessDashboardUpdate"
+  courier/request/response:
+    description: Courier responses to delivery requests
+    publish:
+      operationId: publishCourierRequestResponse
+      summary: Courier accepts or declines delivery request
+      message:
+        $ref: "#/components/messages/CourierRequestResponse"
+  emergency/alert:
+    description: Emergency alerts for urgent situations
+    subscribe:
+      operationId: subscribeEmergencyAlert
+      summary: Receive emergency alerts
+      message:
+        $ref: "#/components/messages/EmergencyAlert"
+components:
+  messages:
+    CourierLocationUpdate:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_location_update
+          data:
+            type: object
+            required:
+              - courier_uid
+              - latitude
+              - longitude
+              - timestamp
+            properties:
+              courier_uid:
+                type: string
+                description: Unique identifier of the courier
+              latitude:
+                type: number
+                format: float
+                minimum: -90
+                maximum: 90
+                description: GPS latitude coordinate
+              longitude:
+                type: number
+                format: float
+                minimum: -180
+                maximum: 180
+                description: GPS longitude coordinate
+              heading:
+                type: number
+                format: float
+                minimum: 0
+                maximum: 359
+                description: Direction of movement in degrees
+              speed:
+                type: number
+                format: float
+                minimum: 0
+                description: Current speed in km/h
+              accuracy:
+                type: number
+                format: float
+                minimum: 0
+                description: GPS accuracy in meters
+              timestamp:
+                type: string
+                format: date-time
+                description: ISO timestamp of location update
+    CourierLocationBroadcast:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_location_update
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - courier_location
+              - estimated_arrival
+              - distance_remaining
+            properties:
+              delivery_uid:
+                type: string
+                description: Associated delivery identifier
+              courier_location:
+                type: object
+                required:
+                  - latitude
+                  - longitude
+                  - updated_at
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+                  heading:
+                    type: number
+                    format: float
+                  updated_at:
+                    type: string
+                    format: date-time
+              estimated_arrival:
+                type: string
+                format: date-time
+                description: Updated estimated arrival time
+              distance_remaining:
+                type: number
+                format: float
+                description: Distance remaining in kilometers
+    DeliveryStatusChange:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - delivery_status_changed
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - new_status
+            properties:
+              delivery_uid:
+                type: string
+                description: Unique delivery identifier
+              new_status:
+                type: string
+                enum:
+                  - requested
+                  - courier_assigned
+                  - en_route_pickup
+                  - picked_up
+                  - en_route_delivery
+                  - delivered
+                  - cancelled
+                  - failed
+                description: New delivery status
+              courier_uid:
+                type: string
+                description: Associated courier identifier
+              proof_photo_url:
+                type: string
+                format: uri
+                description: Photo proof for status change
+              notes:
+                type: string
+                description: Additional status change notes
+              location:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+    DeliveryStatusBroadcast:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - delivery_status_changed
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - delivery_number
+              - status
+              - status_timestamp
+            properties:
+              delivery_uid:
+                type: string
+              delivery_number:
+                type: string
+                description: Human-readable delivery number
+              status:
+                type: string
+                enum:
+                  - requested
+                  - courier_assigned
+                  - en_route_pickup
+                  - picked_up
+                  - en_route_delivery
+                  - delivered
+                  - cancelled
+                  - failed
+              status_timestamp:
+                type: string
+                format: date-time
+              courier_info:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  vehicle_type:
+                    type: string
+                  average_rating:
+                    type: number
+                    format: float
+              proof_photo:
+                type: string
+                format: uri
+              estimated_delivery_time:
+                type: string
+                format: date-time
+    NewDeliveryRequest:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - new_delivery_request
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - delivery_number
+              - pickup_address
+              - delivery_address
+              - package_info
+              - delivery_type
+              - estimated_earnings
+              - estimated_duration
+              - distance_from_courier
+              - expires_at
+            properties:
+              delivery_uid:
+                type: string
+              delivery_number:
+                type: string
+              pickup_address:
+                type: object
+                required:
+                  - street_address
+                  - city
+                  - latitude
+                  - longitude
+                properties:
+                  street_address:
+                    type: string
+                  city:
+                    type: string
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+              delivery_address:
+                type: object
+                required:
+                  - street_address
+                  - city
+                  - latitude
+                  - longitude
+                properties:
+                  street_address:
+                    type: string
+                  city:
+                    type: string
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+              package_info:
+                type: object
+                required:
+                  - total_packages
+                  - size_category
+                properties:
+                  total_packages:
+                    type: integer
+                    minimum: 1
+                  total_weight:
+                    type: number
+                    format: float
+                  size_category:
+                    type: string
+                    enum:
+                      - small
+                      - medium
+                      - large
+                      - extra_large
+                  special_instructions:
+                    type: string
+              delivery_type:
+                type: string
+                enum:
+                  - standard
+                  - express
+                  - priority
+              estimated_earnings:
+                type: number
+                format: float
+                description: Estimated courier earnings in currency
+              estimated_duration:
+                type: number
+                format: float
+                description: Estimated delivery duration in minutes
+              distance_from_courier:
+                type: number
+                format: float
+                description: Distance from courier to pickup in kilometers
+              expires_at:
+                type: string
+                format: date-time
+                description: Request expiration time
+    ChatMessageSend:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - chat_message
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - recipient_user_uid
+              - message_type
+            properties:
+              delivery_uid:
+                type: string
+              recipient_user_uid:
+                type: string
+              message_type:
+                type: string
+                enum:
+                  - text
+                  - photo
+                  - location
+              content:
+                type: string
+                description: Required for text messages
+              photo_url:
+                type: string
+                format: uri
+                description: Required for photo messages
+              location:
+                type: object
+                description: Required for location messages
+                required:
+                  - latitude
+                  - longitude
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+    ChatMessageReceive:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - chat_message
+          data:
+            type: object
+            required:
+              - message_uid
+              - delivery_uid
+              - sender_info
+              - message_type
+              - timestamp
+            properties:
+              message_uid:
+                type: string
+              delivery_uid:
+                type: string
+              sender_info:
+                type: object
+                required:
+                  - user_uid
+                  - first_name
+                  - user_type
+                properties:
+                  user_uid:
+                    type: string
+                  first_name:
+                    type: string
+                  user_type:
+                    type: string
+                    enum:
+                      - sender
+                      - courier
+                      - business_admin
+              message_type:
+                type: string
+                enum:
+                  - text
+                  - photo
+                  - location
+              content:
+                type: string
+              photo_url:
+                type: string
+                format: uri
+              location:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+              timestamp:
+                type: string
+                format: date-time
+    CourierAssigned:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_assigned
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - delivery_number
+              - courier
+              - estimated_pickup_time
+              - contact_methods
+              - tracking_available
+            properties:
+              delivery_uid:
+                type: string
+              delivery_number:
+                type: string
+              courier:
+                type: object
+                required:
+                  - uid
+                  - first_name
+                  - last_name
+                  - vehicle_type
+                  - average_rating
+                  - total_deliveries
+                properties:
+                  uid:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  vehicle_type:
+                    type: string
+                    enum:
+                      - bicycle
+                      - motorcycle
+                      - car
+                      - van
+                  average_rating:
+                    type: number
+                    format: float
+                    minimum: 0
+                    maximum: 5
+                  total_deliveries:
+                    type: integer
+                    minimum: 0
+                  profile_photo_url:
+                    type: string
+                    format: uri
+              estimated_pickup_time:
+                type: string
+                format: date-time
+              contact_methods:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - chat
+                    - phone
+                    - sms
+              tracking_available:
+                type: boolean
+    SystemNotification:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - system_notification
+          data:
+            type: object
+            required:
+              - notification_uid
+              - type
+              - priority
+              - title
+              - message
+            properties:
+              notification_uid:
+                type: string
+              type:
+                type: string
+                enum:
+                  - maintenance
+                  - promotion
+                  - emergency
+                  - update
+              priority:
+                type: string
+                enum:
+                  - low
+                  - normal
+                  - high
+                  - urgent
+              title:
+                type: string
+              message:
+                type: string
+              action_url:
+                type: string
+                format: uri
+              expires_at:
+                type: string
+                format: date-time
+              target_audience:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - all_users
+                    - senders
+                    - couriers
+                    - business_users
+                    - admin_users
+              metadata:
+                type: object
+    CourierAvailabilityChange:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_availability_changed
+          data:
+            type: object
+            required:
+              - courier_uid
+              - is_available
+            properties:
+              courier_uid:
+                type: string
+              is_available:
+                type: boolean
+              current_location:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+    CourierAvailabilityBroadcast:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_availability_changed
+          data:
+            type: object
+            required:
+              - courier_uid
+              - is_available
+              - pending_requests_nearby
+            properties:
+              courier_uid:
+                type: string
+              is_available:
+                type: boolean
+              pending_requests_nearby:
+                type: integer
+                minimum: 0
+    DeliveryEtaUpdate:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - delivery_eta_updated
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - estimated_pickup_time
+              - estimated_delivery_time
+              - reason
+            properties:
+              delivery_uid:
+                type: string
+              estimated_pickup_time:
+                type: string
+                format: date-time
+              estimated_delivery_time:
+                type: string
+                format: date-time
+              reason:
+                type: string
+                enum:
+                  - traffic
+                  - weather
+                  - route_change
+                  - courier_delay
+              delay_minutes:
+                type: integer
+                description: Delay in minutes (positive for delay, negative for earlier)
+    DeliveryMilestone:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - delivery_milestone
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - milestone_type
+              - timestamp
+            properties:
+              delivery_uid:
+                type: string
+              milestone_type:
+                type: string
+                enum:
+                  - courier_at_pickup
+                  - courier_at_delivery
+                  - package_scanned
+                  - signature_collected
+              timestamp:
+                type: string
+                format: date-time
+              location:
+                type: object
+                properties:
+                  latitude:
+                    type: number
+                    format: float
+                  longitude:
+                    type: number
+                    format: float
+              proof_data:
+                type: object
+                properties:
+                  photo_url:
+                    type: string
+                    format: uri
+                  signature_url:
+                    type: string
+                    format: uri
+                  scan_code:
+                    type: string
+    BusinessDashboardUpdate:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - business_dashboard_update
+          data:
+            type: object
+            required:
+              - business_account_uid
+              - update_type
+              - metrics
+            properties:
+              business_account_uid:
+                type: string
+              update_type:
+                type: string
+                enum:
+                  - delivery_completed
+                  - payment_processed
+                  - monthly_summary
+                  - alert
+              metrics:
+                type: object
+                properties:
+                  active_deliveries:
+                    type: integer
+                    minimum: 0
+                  completed_today:
+                    type: integer
+                    minimum: 0
+                  total_spent_today:
+                    type: number
+                    format: float
+                    minimum: 0
+                  average_delivery_time:
+                    type: number
+                    format: float
+                  success_rate:
+                    type: number
+                    format: float
+                    minimum: 0
+                    maximum: 100
+    CourierRequestResponse:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - courier_request_response
+          data:
+            type: object
+            required:
+              - delivery_uid
+              - courier_uid
+              - response
+            properties:
+              delivery_uid:
+                type: string
+              courier_uid:
+                type: string
+              response:
+                type: string
+                enum:
+                  - accepted
+                  - declined
+              decline_reason:
+                type: string
+                enum:
+                  - too_far
+                  - vehicle_unsuitable
+                  - schedule_conflict
+                  - package_restrictions
+                  - other
+              response_timestamp:
+                type: string
+                format: date-time
+    EmergencyAlert:
+      payload:
+        type: object
+        required:
+          - event
+          - data
+        properties:
+          event:
+            type: string
+            enum:
+              - emergency_alert
+          data:
+            type: object
+            required:
+              - alert_uid
+              - alert_type
+              - priority
+              - message
+              - affected_area
+            properties:
+              alert_uid:
+                type: string
+              alert_type:
+                type: string
+                enum:
+                  - safety_incident
+                  - service_disruption
+                  - weather_emergency
+                  - system_outage
+              priority:
+                type: string
+                enum:
+                  - high
+                  - critical
+              message:
+                type: string
+              affected_area:
+                type: object
+                properties:
+                  city:
+                    type: string
+                  zone_name:
+                    type: string
+                  coordinates:
+                    type: object
+                    properties:
+                      latitude:
+                        type: number
+                        format: float
+                      longitude:
+                        type: number
+                        format: float
+                      radius:
+                        type: number
+                        format: float
+                        description: Affected radius in kilometers
+              action_required:
+                type: boolean
+              contact_support:
+                type: boolean
+              expires_at:
+                type: string
+                format: date-time

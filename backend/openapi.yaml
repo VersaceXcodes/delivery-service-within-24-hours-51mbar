@@ -1,0 +1,3002 @@
+openapi: 3.0.0
+info:
+  title: QuickDrop API
+  description: Same-day delivery platform API for connecting senders with couriers
+  version: 1.0.0
+  contact:
+    name: QuickDrop API Support
+    email: api-support@quickdrop.com
+servers:
+  - url: http://localhost:3000
+    description: Development server
+security:
+  - BearerAuth: []
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register new user account
+      operationId: register_user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationRequest"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid registration data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email or phone already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/login:
+    post:
+      summary: Authenticate user and return token
+      operationId: login_user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/auth/logout:
+    post:
+      summary: Logout user and invalidate token
+      operationId: logout_user
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/auth/refresh:
+    post:
+      summary: Refresh authentication token
+      operationId: refresh_token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/forgot-password:
+    post:
+      summary: Request password reset
+      operationId: forgot_password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+      responses:
+        "200":
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/auth/reset-password:
+    post:
+      summary: Reset password with token
+      operationId: reset_password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/auth/profile:
+    get:
+      summary: Get current user profile
+      operationId: get_user_profile
+      responses:
+        "200":
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    put:
+      summary: Update current user profile
+      operationId: update_user_profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserProfileRequest"
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+  /api/v1/users/{user_uid}:
+    get:
+      summary: Get user by UID
+      operationId: get_user_by_uid
+      parameters:
+        - name: user_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/users/{user_uid}/addresses:
+    get:
+      summary: Get user addresses
+      operationId: get_user_addresses
+      parameters:
+        - name: user_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Addresses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Address"
+    post:
+      summary: Add new address for user
+      operationId: create_user_address
+      parameters:
+        - name: user_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAddressRequest"
+      responses:
+        "201":
+          description: Address created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+  /api/v1/addresses/{address_uid}:
+    put:
+      summary: Update address
+      operationId: update_address
+      parameters:
+        - name: address_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAddressRequest"
+      responses:
+        "200":
+          description: Address updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+    delete:
+      summary: Delete address
+      operationId: delete_address
+      parameters:
+        - name: address_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Address deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/couriers/register:
+    post:
+      summary: Register as courier
+      operationId: register_courier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourierRegistrationRequest"
+      responses:
+        "201":
+          description: Courier registration successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Courier"
+  /api/v1/couriers/{courier_uid}:
+    get:
+      summary: Get courier details
+      operationId: get_courier
+      parameters:
+        - name: courier_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Courier details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourierProfile"
+    put:
+      summary: Update courier profile
+      operationId: update_courier
+      parameters:
+        - name: courier_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourierRequest"
+      responses:
+        "200":
+          description: Courier updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourierProfile"
+  /api/v1/couriers/availability:
+    put:
+      summary: Toggle courier availability
+      operationId: toggle_courier_availability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourierAvailabilityRequest"
+      responses:
+        "200":
+          description: Availability updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourierAvailabilityResponse"
+  /api/v1/couriers/{courier_uid}/documents:
+    post:
+      summary: Upload courier verification documents
+      operationId: upload_courier_documents
+      parameters:
+        - name: courier_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CourierDocumentUpload"
+      responses:
+        "201":
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourierDocument"
+  /api/v1/couriers/{courier_uid}/earnings:
+    get:
+      summary: Get courier earnings
+      operationId: get_courier_earnings
+      parameters:
+        - name: courier_uid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Earnings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourierEarnings"
+  /api/v1/deliveries:
+    post:
+      summary: Create new delivery request
+      operationId: create_delivery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeliveryRequest"
+      responses:
+        "201":
+          description: Delivery created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delivery"
+    get:
+      summary: List deliveries with filters
+      operationId: list_deliveries
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Deliveries retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryListResponse"
+  /api/v1/deliveries/{delivery_uid}:
+    get:
+      summary: Get delivery details
+      operationId: get_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Delivery details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryDetails"
+    put:
+      summary: Update delivery
+      operationId: update_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeliveryRequest"
+      responses:
+        "200":
+          description: Delivery updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delivery"
+    delete:
+      summary: Cancel delivery
+      operationId: cancel_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelDeliveryRequest"
+      responses:
+        "200":
+          description: Delivery cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/deliveries/{delivery_uid}/status:
+    get:
+      summary: Get delivery status and tracking
+      operationId: get_delivery_status
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Delivery status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryStatus"
+  /api/v1/deliveries/{delivery_uid}/tracking:
+    get:
+      summary: Get delivery tracking history
+      operationId: get_delivery_tracking
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tracking history retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeliveryTracking"
+  /api/v1/deliveries/{delivery_uid}/accept:
+    post:
+      summary: Accept delivery request (courier)
+      operationId: accept_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Delivery accepted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delivery"
+  /api/v1/deliveries/{delivery_uid}/pickup:
+    post:
+      summary: Confirm package pickup
+      operationId: confirm_pickup
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PickupConfirmationRequest"
+      responses:
+        "200":
+          description: Pickup confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/deliveries/{delivery_uid}/deliver:
+    post:
+      summary: Confirm delivery completion
+      operationId: confirm_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryConfirmationRequest"
+      responses:
+        "200":
+          description: Delivery confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/deliveries/{delivery_uid}/packages:
+    post:
+      summary: Add package to delivery
+      operationId: add_package_to_delivery
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePackageRequest"
+      responses:
+        "201":
+          description: Package added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+  /api/v1/packages/{package_uid}:
+    get:
+      summary: Get package details
+      operationId: get_package
+      parameters:
+        - name: package_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Package details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+    put:
+      summary: Update package details
+      operationId: update_package
+      parameters:
+        - name: package_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePackageRequest"
+      responses:
+        "200":
+          description: Package updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Package"
+  /api/v1/payment-methods:
+    get:
+      summary: Get user payment methods
+      operationId: get_payment_methods
+      responses:
+        "200":
+          description: Payment methods retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentMethod"
+    post:
+      summary: Add new payment method
+      operationId: create_payment_method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentMethodRequest"
+      responses:
+        "201":
+          description: Payment method added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethod"
+  /api/v1/payment-methods/{payment_method_uid}:
+    put:
+      summary: Update payment method
+      operationId: update_payment_method
+      parameters:
+        - name: payment_method_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePaymentMethodRequest"
+      responses:
+        "200":
+          description: Payment method updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethod"
+    delete:
+      summary: Delete payment method
+      operationId: delete_payment_method
+      parameters:
+        - name: payment_method_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment method deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/payments/process:
+    post:
+      summary: Process payment for delivery
+      operationId: process_payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessPaymentRequest"
+      responses:
+        "200":
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+  /api/v1/transactions:
+    get:
+      summary: Get transaction history
+      operationId: get_transactions
+      parameters:
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionListResponse"
+  /api/v1/transactions/{transaction_uid}:
+    get:
+      summary: Get transaction details
+      operationId: get_transaction
+      parameters:
+        - name: transaction_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transaction details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+  /api/v1/promotional-codes/validate:
+    post:
+      summary: Validate promotional code
+      operationId: validate_promotional_code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidatePromoCodeRequest"
+      responses:
+        "200":
+          description: Promotional code validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PromoCodeValidationResponse"
+  /api/v1/deliveries/{delivery_uid}/messages:
+    get:
+      summary: Get delivery messages
+      operationId: get_delivery_messages
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      summary: Send message for delivery
+      operationId: send_delivery_message
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "201":
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /api/v1/messages/{message_uid}/read:
+    put:
+      summary: Mark message as read
+      operationId: mark_message_read
+      parameters:
+        - name: message_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/deliveries/{delivery_uid}/reviews:
+    post:
+      summary: Submit delivery review
+      operationId: submit_delivery_review
+      parameters:
+        - name: delivery_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "201":
+          description: Review submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+  /api/v1/reviews/{review_uid}:
+    get:
+      summary: Get review details
+      operationId: get_review
+      parameters:
+        - name: review_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Review details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+    put:
+      summary: Update review
+      operationId: update_review
+      parameters:
+        - name: review_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReviewRequest"
+      responses:
+        "200":
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+  /api/v1/business-accounts:
+    post:
+      summary: Create business account
+      operationId: create_business_account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBusinessAccountRequest"
+      responses:
+        "201":
+          description: Business account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessAccount"
+  /api/v1/business-accounts/{business_account_uid}:
+    get:
+      summary: Get business account details
+      operationId: get_business_account
+      parameters:
+        - name: business_account_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Business account details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessAccountDetails"
+    put:
+      summary: Update business account
+      operationId: update_business_account
+      parameters:
+        - name: business_account_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBusinessAccountRequest"
+      responses:
+        "200":
+          description: Business account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessAccount"
+  /api/v1/business-accounts/{business_account_uid}/team-members:
+    get:
+      summary: Get business team members
+      operationId: get_business_team_members
+      parameters:
+        - name: business_account_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team members retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BusinessTeamMember"
+    post:
+      summary: Invite team member
+      operationId: invite_team_member
+      parameters:
+        - name: business_account_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteTeamMemberRequest"
+      responses:
+        "201":
+          description: Team member invited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessTeamMember"
+  /api/v1/business-team-members/{member_uid}:
+    put:
+      summary: Update team member
+      operationId: update_team_member
+      parameters:
+        - name: member_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamMemberRequest"
+      responses:
+        "200":
+          description: Team member updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessTeamMember"
+    delete:
+      summary: Remove team member
+      operationId: remove_team_member
+      parameters:
+        - name: member_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Team member removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/business-accounts/{business_account_uid}/analytics:
+    get:
+      summary: Get business account analytics
+      operationId: get_business_analytics
+      parameters:
+        - name: business_account_uid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessAnalytics"
+  /api/v1/files/upload:
+    post:
+      summary: Upload file
+      operationId: upload_file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FileUpload"
+      responses:
+        "201":
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileUploadResponse"
+  /api/v1/files/{file_uid}:
+    get:
+      summary: Get file details
+      operationId: get_file
+      parameters:
+        - name: file_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileDetails"
+    delete:
+      summary: Delete file
+      operationId: delete_file
+      parameters:
+        - name: file_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/notifications:
+    get:
+      summary: Get user notifications
+      operationId: get_notifications
+      parameters:
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationListResponse"
+  /api/v1/notifications/{notification_uid}/read:
+    put:
+      summary: Mark notification as read
+      operationId: mark_notification_read
+      parameters:
+        - name: notification_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/notifications/mark-all-read:
+    put:
+      summary: Mark all notifications as read
+      operationId: mark_all_notifications_read
+      responses:
+        "200":
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/pricing/estimate:
+    post:
+      summary: Get delivery price estimate
+      operationId: get_price_estimate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceEstimateRequest"
+      responses:
+        "200":
+          description: Price estimate calculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceEstimate"
+  /api/v1/admin/users:
+    get:
+      summary: Get all users (admin)
+      operationId: admin_get_users
+      parameters:
+        - name: user_type
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserListResponse"
+  /api/v1/admin/users/{user_uid}/status:
+    put:
+      summary: Update user status (admin)
+      operationId: admin_update_user_status
+      parameters:
+        - name: user_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUpdateUserStatusRequest"
+      responses:
+        "200":
+          description: User status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/admin/couriers/{courier_uid}/verification:
+    put:
+      summary: Update courier verification status (admin)
+      operationId: admin_update_courier_verification
+      parameters:
+        - name: courier_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCourierVerificationRequest"
+      responses:
+        "200":
+          description: Courier verification updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+  /api/v1/admin/deliveries:
+    get:
+      summary: Get all deliveries (admin)
+      operationId: admin_get_deliveries
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Deliveries retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminDeliveryListResponse"
+  /api/v1/admin/system-settings:
+    get:
+      summary: Get system settings (admin)
+      operationId: admin_get_system_settings
+      responses:
+        "200":
+          description: System settings retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SystemSetting"
+  /api/v1/admin/system-settings/{setting_key}:
+    put:
+      summary: Update system setting (admin)
+      operationId: admin_update_system_setting
+      parameters:
+        - name: setting_key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSystemSettingRequest"
+      responses:
+        "200":
+          description: System setting updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemSetting"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - email
+        - phone
+        - password
+        - user_type
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        user_type:
+          type: string
+          enum:
+            - sender
+            - courier
+            - business_admin
+        first_name:
+          type: string
+        last_name:
+          type: string
+        preferred_language:
+          type: string
+          default: en
+        timezone:
+          type: string
+          default: UTC
+        business_info:
+          $ref: "#/components/schemas/BusinessAccountInfo"
+    BusinessAccountInfo:
+      type: object
+      required:
+        - company_name
+      properties:
+        company_name:
+          type: string
+        business_registration_number:
+          type: string
+        tax_id:
+          type: string
+        industry_type:
+          type: string
+    LoginRequest:
+      type: object
+      required:
+        - login_identifier
+        - password
+      properties:
+        login_identifier:
+          type: string
+        password:
+          type: string
+        remember_me:
+          type: boolean
+          default: false
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+          minLength: 8
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+        expires_in:
+          type: number
+    User:
+      type: object
+      properties:
+        uid:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        user_type:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        profile_photo_url:
+          type: string
+        is_email_verified:
+          type: boolean
+        is_phone_verified:
+          type: boolean
+        is_active:
+          type: boolean
+        preferred_language:
+          type: string
+        timezone:
+          type: string
+        notification_preferences:
+          type: string
+        two_factor_enabled:
+          type: boolean
+        last_login_at:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    UserProfile:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            addresses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
+            courier_profile:
+              $ref: "#/components/schemas/Courier"
+            business_account:
+              $ref: "#/components/schemas/BusinessAccount"
+    UpdateUserProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        profile_photo_url:
+          type: string
+        preferred_language:
+          type: string
+        timezone:
+          type: string
+        notification_preferences:
+          type: string
+    Address:
+      type: object
+      properties:
+        uid:
+          type: string
+        user_uid:
+          type: string
+        label:
+          type: string
+        street_address:
+          type: string
+        apartment_unit:
+          type: string
+        city:
+          type: string
+        state_province:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        access_instructions:
+          type: string
+        is_verified:
+          type: boolean
+        use_count:
+          type: number
+        is_favorite:
+          type: boolean
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    CreateAddressRequest:
+      type: object
+      required:
+        - street_address
+        - city
+        - country
+      properties:
+        label:
+          type: string
+        street_address:
+          type: string
+        apartment_unit:
+          type: string
+        city:
+          type: string
+        state_province:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        access_instructions:
+          type: string
+        is_favorite:
+          type: boolean
+    UpdateAddressRequest:
+      type: object
+      properties:
+        label:
+          type: string
+        street_address:
+          type: string
+        apartment_unit:
+          type: string
+        city:
+          type: string
+        state_province:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        access_instructions:
+          type: string
+        is_favorite:
+          type: boolean
+    CourierRegistrationRequest:
+      type: object
+      required:
+        - vehicle_type
+      properties:
+        vehicle_type:
+          type: string
+          enum:
+            - bicycle
+            - motorcycle
+            - car
+            - van
+        vehicle_make:
+          type: string
+        vehicle_model:
+          type: string
+        vehicle_year:
+          type: number
+        license_plate:
+          type: string
+        insurance_policy_number:
+          type: string
+        driver_license_number:
+          type: string
+        max_package_weight:
+          type: number
+        max_package_dimensions:
+          type: string
+        service_radius:
+          type: number
+        base_location_lat:
+          type: number
+        base_location_lng:
+          type: number
+        max_concurrent_deliveries:
+          type: number
+    Courier:
+      type: object
+      properties:
+        uid:
+          type: string
+        user_uid:
+          type: string
+        vehicle_type:
+          type: string
+        vehicle_make:
+          type: string
+        vehicle_model:
+          type: string
+        vehicle_year:
+          type: number
+        license_plate:
+          type: string
+        insurance_policy_number:
+          type: string
+        driver_license_number:
+          type: string
+        max_package_weight:
+          type: number
+        max_package_dimensions:
+          type: string
+        service_radius:
+          type: number
+        base_location_lat:
+          type: number
+        base_location_lng:
+          type: number
+        is_available:
+          type: boolean
+        is_verified:
+          type: boolean
+        verification_status:
+          type: string
+        current_capacity:
+          type: number
+        max_concurrent_deliveries:
+          type: number
+        average_rating:
+          type: number
+        total_deliveries:
+          type: number
+        completion_rate:
+          type: number
+        earnings_balance:
+          type: number
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    CourierProfile:
+      allOf:
+        - $ref: "#/components/schemas/Courier"
+        - type: object
+          properties:
+            user_info:
+              $ref: "#/components/schemas/User"
+            documents:
+              type: array
+              items:
+                $ref: "#/components/schemas/CourierDocument"
+            reviews:
+              type: array
+              items:
+                $ref: "#/components/schemas/Review"
+    UpdateCourierRequest:
+      type: object
+      properties:
+        vehicle_type:
+          type: string
+        vehicle_make:
+          type: string
+        vehicle_model:
+          type: string
+        vehicle_year:
+          type: number
+        license_plate:
+          type: string
+        max_package_weight:
+          type: number
+        max_package_dimensions:
+          type: string
+        service_radius:
+          type: number
+        base_location_lat:
+          type: number
+        base_location_lng:
+          type: number
+        max_concurrent_deliveries:
+          type: number
+    CourierAvailabilityRequest:
+      type: object
+      required:
+        - is_available
+      properties:
+        is_available:
+          type: boolean
+        current_location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+    CourierAvailabilityResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        is_available:
+          type: boolean
+        pending_requests_nearby:
+          type: number
+    CourierDocument:
+      type: object
+      properties:
+        uid:
+          type: string
+        courier_uid:
+          type: string
+        document_type:
+          type: string
+        document_url:
+          type: string
+        document_number:
+          type: string
+        expiry_date:
+          type: string
+        verification_status:
+          type: string
+        verified_by_admin_uid:
+          type: string
+        rejection_reason:
+          type: string
+        uploaded_at:
+          type: string
+        verified_at:
+          type: string
+        created_at:
+          type: string
+    CourierDocumentUpload:
+      type: object
+      required:
+        - file
+        - document_type
+      properties:
+        file:
+          type: string
+          format: binary
+        document_type:
+          type: string
+          enum:
+            - drivers_license
+            - vehicle_registration
+            - insurance
+            - background_check
+        document_number:
+          type: string
+        expiry_date:
+          type: string
+    CourierEarnings:
+      type: object
+      properties:
+        total_earnings:
+          type: number
+        current_balance:
+          type: number
+        paid_earnings:
+          type: number
+        daily_earnings:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              earnings:
+                type: number
+              deliveries_count:
+                type: number
+        weekly_summary:
+          type: object
+          properties:
+            total_earnings:
+              type: number
+            total_deliveries:
+              type: number
+            average_per_delivery:
+              type: number
+    CreateDeliveryRequest:
+      type: object
+      required:
+        - pickup_address
+        - delivery_address
+        - packages
+        - delivery_contact_name
+        - delivery_contact_phone
+      properties:
+        pickup_address:
+          oneOf:
+            - $ref: "#/components/schemas/CreateAddressRequest"
+            - type: object
+              properties:
+                address_uid:
+                  type: string
+        delivery_address:
+          oneOf:
+            - $ref: "#/components/schemas/CreateAddressRequest"
+            - type: object
+              properties:
+                address_uid:
+                  type: string
+        packages:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreatePackageRequest"
+        pickup_contact_name:
+          type: string
+        pickup_contact_phone:
+          type: string
+        delivery_contact_name:
+          type: string
+        delivery_contact_phone:
+          type: string
+        delivery_instructions:
+          type: string
+        pickup_instructions:
+          type: string
+        delivery_type:
+          type: string
+          enum:
+            - standard
+            - express
+            - priority
+          default: standard
+        scheduled_pickup_time:
+          type: string
+        is_signature_required:
+          type: boolean
+        is_photo_proof_required:
+          type: boolean
+        priority_level:
+          type: number
+        payment_method_uid:
+          type: string
+        promotional_code:
+          type: string
+    Delivery:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_number:
+          type: string
+        sender_user_uid:
+          type: string
+        courier_uid:
+          type: string
+        business_account_uid:
+          type: string
+        pickup_address_uid:
+          type: string
+        delivery_address_uid:
+          type: string
+        pickup_contact_name:
+          type: string
+        pickup_contact_phone:
+          type: string
+        delivery_contact_name:
+          type: string
+        delivery_contact_phone:
+          type: string
+        delivery_instructions:
+          type: string
+        pickup_instructions:
+          type: string
+        delivery_type:
+          type: string
+        status:
+          type: string
+        scheduled_pickup_time:
+          type: string
+        actual_pickup_time:
+          type: string
+        estimated_delivery_time:
+          type: string
+        actual_delivery_time:
+          type: string
+        total_distance:
+          type: number
+        base_price:
+          type: number
+        distance_price:
+          type: number
+        surge_multiplier:
+          type: number
+        total_price:
+          type: number
+        courier_earnings:
+          type: number
+        payment_status:
+          type: string
+        cancellation_reason:
+          type: string
+        failure_reason:
+          type: string
+        retry_count:
+          type: number
+        is_signature_required:
+          type: boolean
+        is_photo_proof_required:
+          type: boolean
+        priority_level:
+          type: number
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    DeliveryDetails:
+      allOf:
+        - $ref: "#/components/schemas/Delivery"
+        - type: object
+          properties:
+            pickup_address:
+              $ref: "#/components/schemas/Address"
+            delivery_address:
+              $ref: "#/components/schemas/Address"
+            packages:
+              type: array
+              items:
+                $ref: "#/components/schemas/Package"
+            courier_info:
+              $ref: "#/components/schemas/CourierProfile"
+            sender_info:
+              $ref: "#/components/schemas/User"
+            tracking_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/DeliveryTracking"
+    UpdateDeliveryRequest:
+      type: object
+      properties:
+        delivery_instructions:
+          type: string
+        pickup_instructions:
+          type: string
+        scheduled_pickup_time:
+          type: string
+        delivery_contact_name:
+          type: string
+        delivery_contact_phone:
+          type: string
+    CancelDeliveryRequest:
+      type: object
+      properties:
+        cancellation_reason:
+          type: string
+    DeliveryStatus:
+      type: object
+      properties:
+        delivery_uid:
+          type: string
+        delivery_number:
+          type: string
+        status:
+          type: string
+        status_timestamp:
+          type: string
+        courier_info:
+          type: object
+          properties:
+            uid:
+              type: string
+            first_name:
+              type: string
+            last_name:
+              type: string
+            vehicle_type:
+              type: string
+            current_location:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+        estimated_delivery_time:
+          type: string
+        tracking_url:
+          type: string
+    DeliveryTracking:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_uid:
+          type: string
+        courier_uid:
+          type: string
+        status:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        notes:
+          type: string
+        photo_url:
+          type: string
+        is_milestone:
+          type: boolean
+        estimated_arrival_time:
+          type: string
+        created_at:
+          type: string
+    DeliveryListResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Delivery"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+        statistics:
+          type: object
+          properties:
+            total_deliveries:
+              type: number
+            total_amount:
+              type: number
+            average_rating:
+              type: number
+    PickupConfirmationRequest:
+      type: object
+      properties:
+        photo_urls:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+        pickup_time:
+          type: string
+    DeliveryConfirmationRequest:
+      type: object
+      required:
+        - delivery_confirmation_method
+      properties:
+        delivery_confirmation_method:
+          type: string
+          enum:
+            - handed_to_recipient
+            - left_at_door
+            - left_with_concierge
+        signature:
+          type: string
+        photo_urls:
+          type: array
+          items:
+            type: string
+        recipient_name:
+          type: string
+        notes:
+          type: string
+        delivery_time:
+          type: string
+    Package:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_uid:
+          type: string
+        package_number:
+          type: number
+        description:
+          type: string
+        category:
+          type: string
+        size:
+          type: string
+        weight:
+          type: number
+        dimensions:
+          type: string
+        value:
+          type: number
+        is_fragile:
+          type: boolean
+        special_instructions:
+          type: string
+        insurance_coverage:
+          type: number
+        package_photo_urls:
+          type: string
+        created_at:
+          type: string
+    CreatePackageRequest:
+      type: object
+      required:
+        - size
+      properties:
+        package_number:
+          type: number
+        description:
+          type: string
+        category:
+          type: string
+          enum:
+            - documents
+            - food
+            - electronics
+            - clothing
+            - other
+        size:
+          type: string
+          enum:
+            - small
+            - medium
+            - large
+            - extra_large
+        weight:
+          type: number
+        dimensions:
+          type: string
+        value:
+          type: number
+        is_fragile:
+          type: boolean
+        special_instructions:
+          type: string
+        insurance_coverage:
+          type: number
+        package_photo_urls:
+          type: string
+    UpdatePackageRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        category:
+          type: string
+        size:
+          type: string
+        weight:
+          type: number
+        dimensions:
+          type: string
+        value:
+          type: number
+        is_fragile:
+          type: boolean
+        special_instructions:
+          type: string
+        insurance_coverage:
+          type: number
+    PaymentMethod:
+      type: object
+      properties:
+        uid:
+          type: string
+        user_uid:
+          type: string
+        type:
+          type: string
+        provider:
+          type: string
+        provider_payment_method_id:
+          type: string
+        last_four_digits:
+          type: string
+        expiry_month:
+          type: number
+        expiry_year:
+          type: number
+        cardholder_name:
+          type: string
+        billing_address_uid:
+          type: string
+        is_default:
+          type: boolean
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    CreatePaymentMethodRequest:
+      type: object
+      required:
+        - type
+        - provider_payment_method_id
+      properties:
+        type:
+          type: string
+          enum:
+            - credit_card
+            - debit_card
+            - paypal
+            - apple_pay
+            - google_pay
+        provider:
+          type: string
+        provider_payment_method_id:
+          type: string
+        last_four_digits:
+          type: string
+        expiry_month:
+          type: number
+        expiry_year:
+          type: number
+        cardholder_name:
+          type: string
+        billing_address_uid:
+          type: string
+        is_default:
+          type: boolean
+    UpdatePaymentMethodRequest:
+      type: object
+      properties:
+        expiry_month:
+          type: number
+        expiry_year:
+          type: number
+        cardholder_name:
+          type: string
+        billing_address_uid:
+          type: string
+        is_default:
+          type: boolean
+    ProcessPaymentRequest:
+      type: object
+      required:
+        - delivery_uid
+        - payment_method_uid
+      properties:
+        delivery_uid:
+          type: string
+        payment_method_uid:
+          type: string
+        promotional_code:
+          type: string
+        billing_address_uid:
+          type: string
+    PaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        transaction_uid:
+          type: string
+        amount_charged:
+          type: number
+        payment_status:
+          type: string
+        receipt_url:
+          type: string
+    Transaction:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_uid:
+          type: string
+        user_uid:
+          type: string
+        payment_method_uid:
+          type: string
+        transaction_type:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+        provider_transaction_id:
+          type: string
+        fee_amount:
+          type: number
+        tax_amount:
+          type: number
+        description:
+          type: string
+        failure_reason:
+          type: string
+        processed_at:
+          type: string
+        created_at:
+          type: string
+    TransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+    ValidatePromoCodeRequest:
+      type: object
+      required:
+        - code
+        - delivery_total
+      properties:
+        code:
+          type: string
+        delivery_total:
+          type: number
+    PromoCodeValidationResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        discount_amount:
+          type: number
+        discount_type:
+          type: string
+        final_amount:
+          type: number
+        error_message:
+          type: string
+    Message:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_uid:
+          type: string
+        sender_user_uid:
+          type: string
+        recipient_user_uid:
+          type: string
+        message_type:
+          type: string
+        content:
+          type: string
+        photo_url:
+          type: string
+        location_lat:
+          type: number
+        location_lng:
+          type: number
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+        created_at:
+          type: string
+    SendMessageRequest:
+      type: object
+      required:
+        - recipient_user_uid
+        - message_type
+      properties:
+        recipient_user_uid:
+          type: string
+        message_type:
+          type: string
+          enum:
+            - text
+            - photo
+            - location
+        content:
+          type: string
+        photo_url:
+          type: string
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+    Review:
+      type: object
+      properties:
+        uid:
+          type: string
+        delivery_uid:
+          type: string
+        reviewer_user_uid:
+          type: string
+        reviewed_user_uid:
+          type: string
+        reviewer_type:
+          type: string
+        overall_rating:
+          type: number
+        speed_rating:
+          type: number
+        communication_rating:
+          type: number
+        care_rating:
+          type: number
+        written_review:
+          type: string
+        photo_urls:
+          type: string
+        is_anonymous:
+          type: boolean
+        response_text:
+          type: string
+        response_at:
+          type: string
+        is_featured:
+          type: boolean
+        helpful_votes:
+          type: number
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    CreateReviewRequest:
+      type: object
+      required:
+        - overall_rating
+      properties:
+        overall_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        speed_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        communication_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        care_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        written_review:
+          type: string
+        photo_uids:
+          type: array
+          items:
+            type: string
+        is_anonymous:
+          type: boolean
+    UpdateReviewRequest:
+      type: object
+      properties:
+        overall_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        speed_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        communication_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        care_rating:
+          type: number
+          minimum: 1
+          maximum: 5
+        written_review:
+          type: string
+        photo_uids:
+          type: array
+          items:
+            type: string
+    BusinessAccount:
+      type: object
+      properties:
+        uid:
+          type: string
+        owner_user_uid:
+          type: string
+        company_name:
+          type: string
+        business_registration_number:
+          type: string
+        tax_id:
+          type: string
+        billing_email:
+          type: string
+        billing_phone:
+          type: string
+        company_address:
+          type: string
+        industry_type:
+          type: string
+        is_verified:
+          type: boolean
+        credit_limit:
+          type: number
+        payment_terms:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    CreateBusinessAccountRequest:
+      type: object
+      required:
+        - company_name
+      properties:
+        company_name:
+          type: string
+        business_registration_number:
+          type: string
+        tax_id:
+          type: string
+        billing_email:
+          type: string
+        billing_phone:
+          type: string
+        company_address:
+          type: string
+        industry_type:
+          type: string
+    UpdateBusinessAccountRequest:
+      type: object
+      properties:
+        company_name:
+          type: string
+        billing_email:
+          type: string
+        billing_phone:
+          type: string
+        company_address:
+          type: string
+        industry_type:
+          type: string
+    BusinessAccountDetails:
+      allOf:
+        - $ref: "#/components/schemas/BusinessAccount"
+        - type: object
+          properties:
+            owner_info:
+              $ref: "#/components/schemas/User"
+            team_members:
+              type: array
+              items:
+                $ref: "#/components/schemas/BusinessTeamMember"
+            delivery_stats:
+              type: object
+              properties:
+                total_deliveries:
+                  type: number
+                monthly_volume:
+                  type: number
+                average_cost:
+                  type: number
+            api_integration:
+              type: object
+              properties:
+                active_keys:
+                  type: number
+                webhook_endpoints:
+                  type: array
+                  items:
+                    type: object
+    BusinessTeamMember:
+      type: object
+      properties:
+        uid:
+          type: string
+        business_account_uid:
+          type: string
+        user_uid:
+          type: string
+        role:
+          type: string
+        permissions:
+          type: string
+        invited_by_user_uid:
+          type: string
+        is_active:
+          type: boolean
+        invited_at:
+          type: string
+        joined_at:
+          type: string
+        created_at:
+          type: string
+        user_info:
+          $ref: "#/components/schemas/User"
+    InviteTeamMemberRequest:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+            - admin
+            - manager
+            - user
+        permissions:
+          type: string
+    UpdateTeamMemberRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            - admin
+            - manager
+            - user
+        permissions:
+          type: string
+        is_active:
+          type: boolean
+    BusinessAnalytics:
+      type: object
+      properties:
+        delivery_summary:
+          type: object
+          properties:
+            total_deliveries:
+              type: number
+            completed_deliveries:
+              type: number
+            cancelled_deliveries:
+              type: number
+            average_delivery_time:
+              type: number
+        cost_analysis:
+          type: object
+          properties:
+            total_spent:
+              type: number
+            average_cost_per_delivery:
+              type: number
+            cost_by_delivery_type:
+              type: object
+        team_usage:
+          type: object
+          properties:
+            active_team_members:
+              type: number
+            deliveries_by_member:
+              type: array
+              items:
+                type: object
+        monthly_trends:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+              deliveries:
+                type: number
+              cost:
+                type: number
+    FileUpload:
+      type: object
+      required:
+        - file
+        - entity_type
+        - entity_uid
+        - upload_purpose
+      properties:
+        file:
+          type: string
+          format: binary
+        entity_type:
+          type: string
+          enum:
+            - profile
+            - package
+            - delivery
+            - courier_document
+            - review
+        entity_uid:
+          type: string
+        upload_purpose:
+          type: string
+        is_public:
+          type: boolean
+          default: false
+    FileUploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        file_uid:
+          type: string
+        storage_url:
+          type: string
+        thumbnail_url:
+          type: string
+        file_size:
+          type: number
+        mime_type:
+          type: string
+    FileDetails:
+      type: object
+      properties:
+        uid:
+          type: string
+        user_uid:
+          type: string
+        entity_type:
+          type: string
+        entity_uid:
+          type: string
+        file_type:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: number
+        mime_type:
+          type: string
+        storage_url:
+          type: string
+        thumbnail_url:
+          type: string
+        is_public:
+          type: boolean
+        upload_purpose:
+          type: string
+        metadata:
+          type: string
+        uploaded_at:
+          type: string
+        created_at:
+          type: string
+    Notification:
+      type: object
+      properties:
+        uid:
+          type: string
+        user_uid:
+          type: string
+        delivery_uid:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        channel:
+          type: string
+        status:
+          type: string
+        is_read:
+          type: boolean
+        priority:
+          type: string
+        metadata:
+          type: string
+        scheduled_for:
+          type: string
+        sent_at:
+          type: string
+        read_at:
+          type: string
+        created_at:
+          type: string
+    NotificationListResponse:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+        unread_count:
+          type: number
+    PriceEstimateRequest:
+      type: object
+      required:
+        - pickup_location
+        - delivery_location
+        - packages
+      properties:
+        pickup_location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        delivery_location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        packages:
+          type: array
+          items:
+            type: object
+            properties:
+              size:
+                type: string
+              weight:
+                type: number
+        delivery_type:
+          type: string
+          enum:
+            - standard
+            - express
+            - priority
+        scheduled_pickup_time:
+          type: string
+    PriceEstimate:
+      type: object
+      properties:
+        base_price:
+          type: number
+        distance_price:
+          type: number
+        surge_multiplier:
+          type: number
+        total_price:
+          type: number
+        currency:
+          type: string
+        estimated_pickup_time:
+          type: string
+        estimated_delivery_time:
+          type: string
+        distance:
+          type: number
+        duration:
+          type: number
+    AdminUserListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+    AdminUpdateUserStatusRequest:
+      type: object
+      required:
+        - is_active
+      properties:
+        is_active:
+          type: boolean
+        reason:
+          type: string
+    AdminCourierVerificationRequest:
+      type: object
+      required:
+        - verification_status
+      properties:
+        verification_status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+        rejection_reason:
+          type: string
+    AdminDeliveryListResponse:
+      type: object
+      properties:
+        deliveries:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeliveryDetails"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+    SystemSetting:
+      type: object
+      properties:
+        uid:
+          type: string
+        setting_key:
+          type: string
+        setting_value:
+          type: string
+        setting_type:
+          type: string
+        description:
+          type: string
+        is_public:
+          type: boolean
+        updated_by_admin_uid:
+          type: string
+        updated_at:
+          type: string
+        created_at:
+          type: string
+    UpdateSystemSettingRequest:
+      type: object
+      required:
+        - setting_value
+      properties:
+        setting_value:
+          type: string
+        description:
+          type: string
+    PaginationInfo:
+      type: object
+      properties:
+        current_page:
+          type: number
+        total_pages:
+          type: number
+        total_count:
+          type: number
+        per_page:
+          type: number
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object

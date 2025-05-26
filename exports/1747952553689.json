@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747952553689,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_Login",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_Login.tsx",
+      "type": "text",
+      "size": 21592,
+      "dependencies": false
+    }
+  ]
+}

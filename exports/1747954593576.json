@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747954593576,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_CourierDashboard",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_CourierDashboard.tsx",
+      "type": "text",
+      "size": 46471,
+      "dependencies": false
+    }
+  ]
+}

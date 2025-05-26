@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747952710388,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_Dashboard",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_Dashboard.tsx",
+      "type": "text",
+      "size": 37774,
+      "dependencies": false
+    }
+  ]
+}

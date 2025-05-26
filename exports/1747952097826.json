@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747952097826,
+  "operation": {
+    "id": "webapp:react:store",
+    "refs": {
+      "id": "redux",
+      "version": "1747951935273"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/store/main.tsx",
+      "type": "text",
+      "size": 25097,
+      "dependencies": false
+    }
+  ]
+}

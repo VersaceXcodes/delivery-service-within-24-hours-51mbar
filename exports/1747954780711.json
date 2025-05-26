@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747954780711,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_Landing",
+      "version": "latest"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/UV_Landing.tsx",
+      "type": "text",
+      "size": 49467,
+      "dependencies": false
+    }
+  ]
+}

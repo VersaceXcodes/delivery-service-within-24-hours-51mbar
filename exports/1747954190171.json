@@ -1,0 +1,19 @@
+{
+  "timestamp": 1747954190171,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_Footer",
+      "version": "1747952249179"
+    }
+  },
+  "projectId": "delivery-service-within-24-hours",
+  "files": [
+    {
+      "path": "/mnt/data/delivery-service-within-24-hours/vitereact/src/components/views/GV_Footer.tsx",
+      "type": "text",
+      "size": 29260,
+      "dependencies": false
+    }
+  ]
+}
