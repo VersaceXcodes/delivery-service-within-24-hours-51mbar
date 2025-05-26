@@ -1,2 +1,3 @@
-# delivery-service-within-24-hours-51mbar
-Generated project for delivery-service-within-24-hours
+# delivery-service-within-24-hours
+
+This is the README for delivery-service-within-24-hours.
